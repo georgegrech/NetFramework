@@ -1,7 +1,9 @@
 ﻿using Business;
 using Common;
+using Data;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
@@ -17,6 +19,8 @@ namespace NetFramework.Controllers
 {
     public class ProductController : ApiController
     {
+        private static string cs = System.Configuration.ConfigurationManager.ConnectionStrings["TestGeorge"].ConnectionString;
+
         [HttpGet]
         public IHttpActionResult Get()
         {
@@ -33,6 +37,24 @@ namespace NetFramework.Controllers
             return Json(dlist);
         }
 
+        [HttpGet]
+        public IHttpActionResult GetSP()
+        {
+            string spname = "sp_Categories";
+            var dt = SqlConnector.ReadFromSP(cs, spname);
+            return Json(dt.Convert());
+        }
+
+
+        [HttpGet]
+        public IHttpActionResult GetSP(int id)
+        {
+            string spname = "sp_Categories_Search";
+            var p = new SqlParameter("@id", id);
+            var dt = SqlConnector.ReadFromSP(cs, spname, p);
+            return Json(dt.Convert());
+        }
+
         // GET api/values/5
         [HttpGet]
         public IHttpActionResult Get(int id)
@@ -42,7 +64,7 @@ namespace NetFramework.Controllers
             d.Id = itemResult.Id;
             d.Name = itemResult.Name;
             d.Description = itemResult.Description;
-         
+
             return Json(d);
         }
 
